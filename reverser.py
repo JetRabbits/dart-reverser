@@ -2,7 +2,7 @@ import regex as re
 import os
 import argparse
 
-pattern = b'package:(\w[0-9a-zA-Z-_/.]+).+file:///[A-Z]?:?/?([0-9a-zA-Z-_/.]+dart)..([^\x00]+)\x00'
+pattern = b'package:(\w[0-9a-zA-Z-_/.]+)[^file:///]+file:///[A-Z]?:?/?([0-9a-zA-Z-_/.]+dart)..([^\x00]+)\x00'
 package_group = 1
 file_group = 2
 content_group = 3
@@ -16,6 +16,7 @@ def run_app(kernel: str):
         while chunk := dart_kernel.read(1024):
             read_buffer = read_buffer + chunk
             if re.search(b'\x11\x11\x11\x11\x11\x10\x0D', read_buffer) is not None:
+                print('End file section')
                 break
             if not files_section_is_found:
                 files_section_is_found = re.search(pattern,

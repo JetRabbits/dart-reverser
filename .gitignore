@@ -1,6 +1,7 @@
 # Idea project files
 .idea
 *.iml
+test
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
