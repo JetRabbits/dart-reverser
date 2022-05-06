@@ -29,18 +29,28 @@ def run_app(kernel: str):
                                           read_buffer)
 
                 if search_result is not None:
-                    resource_path = os.path.normpath(search_result.group(file_group).replace(b':', b'').decode())
-                    dir_path = os.path.join(os.path.curdir, 'extracted', os.path.dirname(resource_path))
-                    print(dir_path)
-                    if not os.path.exists(dir_path):
-                        os.makedirs(dir_path)
-                    file_path = os.path.join(dir_path, os.path.basename(resource_path))
-
+                    resource_reference = search_result.group(file_group)
+                    file_path = prepare_file_path(resource_reference)
                     # Пишем данные в файл
-                    with open(file_path, 'wb') as file:
-                        print('writing to file %s' % file_path)
-                        file.write(search_result.group(content_group)[:-1])
+                    file_data = search_result.group(content_group)[:-1]
+                    write_data_to_file(file_path, file_data)
                     read_buffer = read_buffer[search_result.regs[content_group][1]:]
+
+
+def prepare_file_path(resource_string:bytearray):
+    resource_path = os.path.normpath(resource_string.replace(b':', b'').decode())
+    dir_path = os.path.join(os.path.curdir, 'extracted', os.path.dirname(resource_path))
+    print(dir_path)
+    if not os.path.exists(dir_path):
+        os.makedirs(dir_path)
+    file_path = os.path.join(dir_path, os.path.basename(resource_path))
+    return file_path
+
+
+def write_data_to_file(file_path: str, data: bytearray):
+    with open(file_path, 'wb') as file:
+        print('writing to file %s' % file_path)
+        file.write(data)
 
 
 if __name__ == '__main__':
